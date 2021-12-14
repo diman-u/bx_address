@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "maxbanton/dd": "^2.0"
+    }
+}
