@@ -3,3 +3,8 @@
     width: 800px;
     min-height : 400px;
 }
+
+#Address_table svg{
+    margin-right: 10px;
+    cursor: pointer;
+}

@@ -41,7 +41,8 @@ CUtil::InitJSCore( array('ajax' , 'jquery' , 'popup'));
                     'AJAX_ID' => CAjax::getComponentID('bitrix:main.ui.grid', '.default', ''),
                     'PAGE_SIZES' => [
                         ['NAME' => "5", 'VALUE' => '5'],
-                        ['NAME' => '10', 'VALUE' => '10']
+                        ['NAME' => '10', 'VALUE' => '10'],
+                        ['NAME' => '20', 'VALUE' => '20']
                     ],
                     'AJAX_OPTION_JUMP' => 'N',
                     'SHOW_CHECK_ALL_CHECKBOXES' => true,
@@ -66,6 +67,8 @@ CUtil::InitJSCore( array('ajax' , 'jquery' , 'popup'));
         </div>
     </div>
     <div id="ajax-add-answer"></div>
+    <div id="ajax-edit-answer"></div>
+    <div id="ajax-rm-answer"></div>
 
 
 <script type="text/javascript">
@@ -82,7 +85,7 @@ CUtil::InitJSCore( array('ajax' , 'jquery' , 'popup'));
             draggable: {restrict: false},
             buttons: [
                 new BX.PopupWindowButton({
-                    text: "Отправить",
+                    text: "Сохранить",
                     className: "popup-window-button-accept",
                     events: {click: function(){
                             BX.ajax.runComponentAction('app:address.list',
@@ -108,9 +111,96 @@ CUtil::InitJSCore( array('ajax' , 'jquery' , 'popup'));
                 })
             ]
         });
+
         $('#add_address').click(function(){
             BX.ajax.insertToNode('<?=$templateFolder.'/ajax/add.php';?>', BX('ajax-add-answer'));
             addAnswer.show();
+        });
+
+
+        var editAnswer = new BX.PopupWindow("my_answer_edit", null, {
+            content: BX('ajax-edit-answer'),
+            closeIcon: {right: "20px", top: "10px"},
+            titleBar: {content: BX.create("span", {html: '<b>Редактировать адрес</b>', 'props': {'className': 'access-title-bar'}})},
+            zIndex: 0,
+            offsetLeft: 0,
+            offsetTop: 0,
+            draggable: {restrict: false},
+            buttons: [
+                new BX.PopupWindowButton({
+                    text: "Изменить",
+                    className: "popup-window-button-accept",
+                    events: {click: function(){
+                            BX.ajax.runComponentAction('app:address.list',
+                                'editAddress', {
+                                    mode: 'class',
+                                    data: {
+                                        id: $('#addrID_edit').val(),
+                                        userID: $('#user_edit').val(),
+                                        address: $('#address_edit').val(),
+                                        active: $('#active_edit').val(),
+                                    },
+                                })
+                                .then(function (response) {
+                                    location.reload();
+                                });
+                            this.popupWindow.close();
+                        }}
+                }),
+                new BX.PopupWindowButton({
+                    text: "Закрыть",
+                    className: "webform-button-link-cancel",
+                    events: {click: function(){
+                            this.popupWindow.close();
+                        }}
+                })
+            ]
+        });
+
+        $('.edit_address').click(function(){
+            BX.ajax.insertToNode('<?=$templateFolder?>' +'/ajax/edit.php?ID=' + $(this).data('addressid'), BX('ajax-edit-answer'));
+            editAnswer.show();
+        });
+
+        var rmAnswer = new BX.PopupWindow("my_answer_rm", null, {
+            content: BX('ajax-rm-answer'),
+            closeIcon: {right: "20px", top: "10px"},
+            titleBar: {content: BX.create("span", {html: '<b>Удалить адрес</b>', 'props': {'className': 'access-title-bar'}})},
+            zIndex: 0,
+            offsetLeft: 0,
+            offsetTop: 0,
+            draggable: {restrict: false},
+            buttons: [
+                new BX.PopupWindowButton({
+                    text: "Удалить",
+                    className: "popup-window-button-accept",
+                    events: {click: function(){
+                            BX.ajax.runComponentAction('app:address.list',
+                                'rmAddress', {
+                                    mode: 'class',
+                                    data: {
+                                        id: $('#addrID_edit').val()
+                                    },
+                                })
+                                .then(function (response) {
+                                    location.reload();
+                                });
+                            this.popupWindow.close();
+                        }}
+                }),
+                new BX.PopupWindowButton({
+                    text: "Закрыть",
+                    className: "webform-button-link-cancel",
+                    events: {click: function(){
+                            this.popupWindow.close();
+                        }}
+                })
+            ]
+        });
+
+        $('.rm_address').click(function(){
+            BX.ajax.insertToNode('<?=$templateFolder?>' +'/ajax/remove.php?ID=' + $(this).data('addressid'), BX('ajax-rm-answer'));
+            rmAnswer.show();
         });
     });
 </script>
