@@ -65,6 +65,7 @@ class AppAddressComponent extends \CBitrixComponent implements Controllerable
             ['id' => 'UF_USER_ID', 'name' => 'Пользователь ID', 'sort' => 'UF_USER_ID', 'default' => true],
             ['id' => 'UF_ACTIVE', 'sort' => 'UF_ACTIVE', 'name' => 'Активность', 'default' => true],
             ['id' => 'UF_ADDRESS_USER', 'sort' => 'UF_ADDRESS_USER', 'name' => 'Адрес пользователя', 'default' => true],
+            ['id' => 'actions', 'name' => 'Действия'],
         ];
 
         $this->arResult['ROWS'] = $data;
@@ -87,6 +88,8 @@ class AppAddressComponent extends \CBitrixComponent implements Controllerable
 
     public function addAddressAction($userID, $address)
     {
+        if(empty($userID) && empty($address)) { return false;}
+
         if (CModule::IncludeModule('highloadblock')) {
             $hlblock = HL\HighloadBlockTable::getById(self::HIGHLOAD_ADDRESS)->fetch();
             $entity = HL\HighloadBlockTable::compileEntity($hlblock);
