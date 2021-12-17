@@ -19,7 +19,7 @@ class AppAddressComponent extends \CBitrixComponent implements Controllerable
         $taggedCache = Application::getInstance()->getTaggedCache();
 
         $cachePath = 'address';
-        $cacheTtl = 3600;
+        $cacheTtl = $this->arParams['SHOW_ELEMENTS'] ? (int)$this->arParams['SHOW_ELEMENTS'] : 3600;
         $cacheKey = SITE . '__address';
 
         if ($cache->initCache($cacheTtl, $cacheKey, $cachePath)) {
@@ -28,7 +28,6 @@ class AppAddressComponent extends \CBitrixComponent implements Controllerable
 
             $taggedCache->startTagCache($cachePath);
             if (CModule::IncludeModule('highloadblock')) {
-                $data = [];
                 $hlblock = HL\HighloadBlockTable::getById(self::HIGHLOAD_ADDRESS)->fetch();
                 $entity = HL\HighloadBlockTable::compileEntity($hlblock);
                 $entity_data_class = $entity->getDataClass();

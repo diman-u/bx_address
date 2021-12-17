@@ -21,6 +21,8 @@ $arComponentParameters = [
                 "N" =>  "Только активные"
             ],
             "DEFAULT"  =>  "Y",
-        ]
+        ],
+        "CACHE_TYPE" => "Y",
+        "CACHE_TIME" => "3600"
     ]
 ];
