@@ -8,13 +8,12 @@ if (Loader::getLocal('/vendor/autoload.php')) {
 }
 
 $eventManager = \Bitrix\Main\EventManager::getInstance();
-$eventManager->addEventHandler('', 'AddressOnAfterAdd', 'OnAfterAdd');
 
-/**
- * После добавления элемента HB Address
- * @param \Bitrix\Main\Entity\Event $event
- **/
-function OnAfterAdd(\Bitrix\Main\Entity\Event $event) {
+$eventManager->addEventHandler('', 'AddressReferenceOnAfterAdd', 'clearAddressReferenceCache');
+$eventManager->addEventHandler('', 'AddressReferenceOnAfterUpdate', 'clearAddressReferenceCache');
+$eventManager->addEventHandler('', 'AddressReferenceOnAfterDelete', 'clearAddressReferenceCache');
 
-    BXClearCache( true, "/");
+function clearAddressReferenceCache($event)
+{
+    $event->getEntity()->cleanCache();
 }

@@ -3,6 +3,8 @@
 use Bitrix\Highloadblock as HL;
 use Bitrix\Main\Engine\Contract\Controllerable;
 use Bitrix\Main\Engine\ActionFilter;
+use \Bitrix\Main\Data\Cache;
+use \Bitrix\Main\Application;
 
 class AppAddressComponent extends \CBitrixComponent implements Controllerable
 {
@@ -11,17 +13,20 @@ class AppAddressComponent extends \CBitrixComponent implements Controllerable
     public function executeComponent()
     {
         global $USER;
-        $additionalCacheID = SITE_ID."_address";
+        $cache = Cache::createInstance();
+        $taggedCache = Application::getInstance()->getTaggedCache();
+        $cache = Cache::createInstance();
+        $taggedCache = Application::getInstance()->getTaggedCache();
 
-        // время кеширования
-        if (!isset($this->arParams['CACHE_TIME'])) {
-            $this->arParams['CACHE_TIME'] = 3600;
-        } else {
-            $this->arParams['CACHE_TIME'] = intval($this->arParams['CACHE_TIME']);
-        }
+        $cachePath = 'address';
+        $cacheTtl = 3600;
+        $cacheKey = SITE . '__address';
 
-        if ($this->StartResultCache($this->arParams['CACHE_TIME'], $additionalCacheID, '/')) {
+        if ($cache->initCache($cacheTtl, $cacheKey, $cachePath)) {
+            $data = $cache->getVars();
+        } elseif ($cache->startDataCache()) {
 
+            $taggedCache->startTagCache($cachePath);
             if (CModule::IncludeModule('highloadblock')) {
                 $data = [];
                 $hlblock = HL\HighloadBlockTable::getById(self::HIGHLOAD_ADDRESS)->fetch();
@@ -42,14 +47,14 @@ class AppAddressComponent extends \CBitrixComponent implements Controllerable
 
                     $item['UF_ACTIVE'] = ($item['UF_ACTIVE']) ? 'Да' : 'Нет';
                     $item['ACTIONS'] = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square edit_address" viewBox="0 0 16 16" data-addressid="'.$item['ID'].'">
-                                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                                        </svg>
-                                        
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash rm_address" viewBox="0 0 16 16" data-addressid="'.$item['ID'].'">
-                                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                          <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                                        </svg>';
+                                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                      <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                    </svg>
+                                    
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash rm_address" viewBox="0 0 16 16" data-addressid="'.$item['ID'].'">
+                                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                      <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                    </svg>';
 
                     $data[] = [
                         'data' => $item
@@ -57,14 +62,16 @@ class AppAddressComponent extends \CBitrixComponent implements Controllerable
                 }
             }
 
-            $this->SetResultCacheKeys(
-                ['UF_USER_ID', 'UF_ACTIVE', 'UF_ADDRESS_USER']
-            );
-            $this->EndResultCache();
+            $taggedCache->registerTag('hlblock_address');
 
+            $cacheInvalid = false;
+            if ($cacheInvalid) {
+                $taggedCache->abortTagCache();
+                $cache->abortDataCache();
+            }
 
-        } else {
-            $this->AbortResultCache();
+            $taggedCache->endTagCache();
+            $cache->endDataCache($data);
         }
 
         $this->arResult['GRID_ID'] = 'Address';

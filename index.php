@@ -7,8 +7,7 @@ $APPLICATION->SetTitle("Адреса пользователя");
 	'app:address.list',
 	'',
 	[
-		'SHOW_ELEMENTS' => 'N',
-		'CACHE_TIME'  => ['DEFAULT' => 3600]
+		'SHOW_ELEMENTS' => 'N'
 	],
 	false
 );?>
